@@ -6,6 +6,7 @@ type Token struct {
 }
 
 func Tokenize(input string) []Token {
+	start := 0
 	index := 0
 	tokens := make([]Token, 0)
 
@@ -34,12 +35,16 @@ func Tokenize(input string) []Token {
 			newToken := Token{Kind: "dice", Value: "d"}
 			tokens = append(tokens, newToken)
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			// Handle number
-			newToken := Token{Kind: "number", Value: string(k)}
+			// Handle multi-character numbers
+			start = index
+			for index < len(input) && input[index] >= '0' && input[index] <= '9' {
+				index++
+			}
+			newToken := Token{Kind: "number", Value: input[start:index]}
 			tokens = append(tokens, newToken)
+			index-- // Decrement because the main loop will increment
 		default:
 			panic("Unexpected character: " + string(k))
-
 		}
 		if index >= len(input)-1 {
 			break
